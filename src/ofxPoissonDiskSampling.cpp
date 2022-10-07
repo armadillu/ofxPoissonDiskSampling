@@ -23,13 +23,16 @@ vector<float> ofxPoissonDiskSampling::sample1D(float w, float density, bool bord
     return result;
 }
 
-vector<ofVec2f> ofxPoissonDiskSampling::sample2D(float w, float h, float density, bool borders, int *bordersStart) {
+vector<ofVec2f> ofxPoissonDiskSampling::sample2D(float w, float h, float density, bool borders,
+												 int *bordersStart, size_t seed, int attempts,
+												 function<float(vector<unsigned> &)> pixelValEval){
     vector<ofVec2f> result;
 
     // create positions
     {
         vector<Vec<2,float>> found;
-        bluenoise_sample(density, Vec<2,float>(density,density), Vec<2,float>(w - density,h - density), found);
+        bluenoise_sample(density, Vec<2,float>(density,density), Vec<2,float>(w - density,h - density),
+						 found, seed, attempts, pixelValEval);
 
         for(auto v : found) {
             result.push_back(ofVec2f(v[0],v[1]));

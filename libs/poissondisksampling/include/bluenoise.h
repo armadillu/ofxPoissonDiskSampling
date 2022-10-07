@@ -40,8 +40,9 @@ unsigned long int n_dimensional_array_index(const Vec<N,unsigned int> &dimension
 
 template<unsigned int N, class T>
 void bluenoise_sample(T radius, Vec<N,T> xmin, Vec<N,T> xmax, std::vector<Vec<N,T> > &sample,
-                      unsigned int seed=0, int max_sample_attempts=30)
-{
+					  unsigned int seed=0, int max_sample_attempts=30,
+					  function<float(std::vector<unsigned int> &)> pixelValEval = [](std::vector<unsigned int> &){return 1.0;}){
+
     sample.clear();
     std::vector<unsigned int> active_list;
 
@@ -70,20 +71,29 @@ void bluenoise_sample(T radius, Vec<N,T> xmin, Vec<N,T> xmax, std::vector<Vec<N,
         int p=active_list[r];
         bool found_sample=false;
         Vec<N,unsigned int> j, jmin, jmax;
+
         for(int attempt=0; attempt<max_sample_attempts; ++attempt){
-            sample_annulus(radius, sample[p], seed, x);
-            // check this sample is within bounds
+
+			vector<unsigned int> coords;
+			for(unsigned int d=0; d<N; ++d){ //for each dimension
+				coords.push_back(int(sample[p][d]));
+			}
+			T rrr = pixelValEval(coords);
+            sample_annulus(rrr, sample[p], seed, x);
+
+			// check this sample is within bounds
             for(unsigned int i=0; i<N; ++i){
                 if(x[i]<xmin[i] || x[i]>xmax[i])
                     goto reject_sample;
             }
-            // test proximity to nearby samples
-            for(unsigned int i=0; i<N; ++i){
-                int thismin=(int)((x[i]-radius-xmin[i])/grid_dx);
+
+			// test proximity to nearby samples
+            for(unsigned int i=0; i<N; ++i){ //for each dimension
+                int thismin=(int)((x[i]-rrr-xmin[i])/grid_dx);
                 if(thismin<0) thismin=0;
                 else if(thismin>=(int)dimensions[i]) thismin=dimensions[i]-1;
                 jmin[i]=(unsigned int)thismin;
-                int thismax=(int)((x[i]+radius-xmin[i])/grid_dx);
+                int thismax=(int)((x[i]+rrr-xmin[i])/grid_dx);
                 if(thismax<0) thismax=0;
                 else if(thismax>=(int)dimensions[i]) thismax=dimensions[i]-1;
                 jmax[i]=(unsigned int)thismax;
@@ -92,7 +102,7 @@ void bluenoise_sample(T radius, Vec<N,T> xmin, Vec<N,T> xmax, std::vector<Vec<N,
                 // check if there's a sample at j that's too close to x
                 k=n_dimensional_array_index(dimensions, j);
                 if(accel[k]>=0 && accel[k]!=p){ // if there is a sample point different from p
-                    if(dist2(x, sample[accel[k]])<sqr(radius))
+                    if(dist2(x, sample[accel[k]])<sqr(rrr))
                         goto reject_sample;
                 }
                 // move on to next j
