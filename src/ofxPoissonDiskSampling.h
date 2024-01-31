@@ -15,7 +15,7 @@ public:
     /// in that case, the index of the first border pt in the result vector is written to `bordersStart`, unless it is NULL
 	static vector<ofVec2f> sample2D(float w, float h, float density, bool borders = false,
 									int *bordersStart = NULL, size_t seed = 0, int attempts = 30,
-									function<float(std::vector<unsigned > &)> pixelValEval = [](std::vector<unsigned > &){return 1.0;}
+									std::function<float(std::vector<unsigned > &)> pixelValEval = [](std::vector<unsigned > &){return 1.0;}
 									);
 
     /// samples points within the box [(0,0,0), (w,h,d)] with minimum distance `density / 2`

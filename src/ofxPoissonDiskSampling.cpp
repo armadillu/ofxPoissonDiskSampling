@@ -25,7 +25,7 @@ vector<float> ofxPoissonDiskSampling::sample1D(float w, float density, bool bord
 
 vector<ofVec2f> ofxPoissonDiskSampling::sample2D(float w, float h, float density, bool borders,
 												 int *bordersStart, size_t seed, int attempts,
-												 function<float(vector<unsigned> &)> pixelValEval){
+												 std::function<float(vector<unsigned> &)> pixelValEval){
     vector<ofVec2f> result;
 
     // create positions

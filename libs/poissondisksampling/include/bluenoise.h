@@ -41,7 +41,7 @@ unsigned long int n_dimensional_array_index(const Vec<N,unsigned int> &dimension
 template<unsigned int N, class T>
 void bluenoise_sample(T radius, Vec<N,T> xmin, Vec<N,T> xmax, std::vector<Vec<N,T> > &sample,
 					  unsigned int seed=0, int max_sample_attempts=30,
-					  function<float(std::vector<unsigned int> &)> pixelValEval = [](std::vector<unsigned int> &){return 1.0;}){
+					  std::function<float(std::vector<unsigned int> &)> pixelValEval = [](std::vector<unsigned int> &){return 1.0;}){
 
     sample.clear();
     std::vector<unsigned int> active_list;
